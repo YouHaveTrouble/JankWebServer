@@ -4,7 +4,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import me.youhavetrouble.jankwebserver.endpoint.Endpoint;
 import me.youhavetrouble.jankwebserver.exception.EndpointAlreadyRegisteredException;
-import me.youhavetrouble.jankwebserver.exception.InvalidPathException;
+import me.youhavetrouble.jankwebserver.response.HttpResponse;
 
 import java.io.IOException;
 import java.net.URLDecoder;
@@ -15,6 +15,8 @@ import java.util.regex.Pattern;
 
 public class Kernel implements HttpHandler {
 
+    protected Kernel() {}
+
     private final HashSet<Endpoint> endpoints = new HashSet<>();
 
     @Override
@@ -22,9 +24,12 @@ public class Kernel implements HttpHandler {
 
         Endpoint foundEndpoint = null;
         String path = httpExchange.getRequestURI().getPath();
+        if (path.endsWith("/")) {
+            path = path.substring(0, path.length()-1);
+        }
 
         for (Endpoint endpoint : endpoints) {
-            if (!Pattern.matches("^"+endpoint.path()+"[/]{0,1}$", path)) continue;
+            if (!Pattern.matches(endpoint.path(), path)) continue;
             foundEndpoint = endpoint;
             break;
         }
@@ -38,26 +43,25 @@ public class Kernel implements HttpHandler {
 
         String requestBody = new String(httpExchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
 
-        foundEndpoint.handle(queryParams, requestBody);
+        HttpResponse response = foundEndpoint.handle(httpExchange, queryParams, requestBody);
 
-        sendNotFound(httpExchange);
+        httpExchange.getResponseHeaders().putAll(response.headers());
+
+        httpExchange.getResponseHeaders().set("Content-Type", response.contentType());
+        httpExchange.sendResponseHeaders(response.status(), response.body().length());
+        httpExchange.getResponseBody().write(response.body().getBytes(StandardCharsets.UTF_8));
+        httpExchange.close();
+
     }
 
-    /**
-     * Registers the endpoint.
-     * <br>
-     * Endpoint path needs to match ^[\p{L}0-9/\-_]*$ regex
-     * @param endpoint Endpoint to register
-     * @throws EndpointAlreadyRegisteredException if endpoint was already registered
-     * @throws InvalidPathException if endpoint's path does not match ^[\p{L}0-9/\-_]*$ regex
-     */
     protected void registerEndpoint(Endpoint endpoint) {
-        if (!Pattern.matches("^[\\p{L}0-9/\\-_]*$", endpoint.path())) {
-            throw new InvalidPathException(String.format("Path %s contains disallowed characters", endpoint.path()));
-        }
         if (!endpoints.add(endpoint)) {
             throw new EndpointAlreadyRegisteredException("Endpoint like that is already registered");
         }
+    }
+
+    protected void unregisterEndpoint(Endpoint endpoint) {
+        endpoints.remove(endpoint);
     }
 
     private void sendNotFound(HttpExchange httpExchange) throws IOException {

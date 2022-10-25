@@ -3,10 +3,15 @@ package me.youhavetrouble.jankwebserver.response;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class JsonResponse implements HttpResponse {
 
     private final int status;
     private final JSONObject body;
+    private final HashMap<String, List<String>> headers = new HashMap<>();
 
     private JsonResponse(int status, JSONObject body) {
         this.status = status;
@@ -16,6 +21,11 @@ public class JsonResponse implements HttpResponse {
     @Override
     public String contentType() {
         return "application/json";
+    }
+
+    @Override
+    public Map<? extends String, ? extends List<String>> headers() {
+        return headers;
     }
 
     @Override
