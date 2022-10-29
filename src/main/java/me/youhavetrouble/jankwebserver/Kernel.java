@@ -11,6 +11,7 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 public class Kernel implements HttpHandler {
@@ -43,13 +44,34 @@ public class Kernel implements HttpHandler {
 
         String requestBody = new String(httpExchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
 
-        HttpResponse response = foundEndpoint.handle(httpExchange, queryParams, requestBody);
+        RequestMethod requestMethod = null;
+        try {
+            requestMethod = RequestMethod.valueOf(
+                    httpExchange
+                            .getRequestMethod()
+                            .trim()
+                            .toUpperCase(Locale.ENGLISH)
+            );
+        } catch (IllegalArgumentException ignored) {}
+
+        if (requestMethod == null) {
+            sendBadRequest(httpExchange);
+            return;
+        }
+
+        HttpResponse response = foundEndpoint.handle(
+                requestMethod,
+                httpExchange.getRequestURI(),
+                httpExchange.getRequestHeaders(),
+                queryParams,
+                requestBody
+        );
 
         httpExchange.getResponseHeaders().putAll(response.headers());
 
         httpExchange.getResponseHeaders().set("Content-Type", response.contentType());
-        httpExchange.sendResponseHeaders(response.status(), response.body().length());
         httpExchange.getResponseBody().write(response.body().getBytes(StandardCharsets.UTF_8));
+        httpExchange.sendResponseHeaders(response.status(), response.body().length());
         httpExchange.close();
 
     }
@@ -66,10 +88,15 @@ public class Kernel implements HttpHandler {
 
     private void sendNotFound(HttpExchange httpExchange) throws IOException {
         httpExchange.getResponseHeaders().set("Content-Type", "application/json");
-        httpExchange.sendResponseHeaders(404, 0);
+        httpExchange.sendResponseHeaders(404, -1);
         httpExchange.close();
     }
 
+    private void sendBadRequest(HttpExchange httpExchange) throws IOException {
+        httpExchange.getResponseHeaders().set("Content-Type", "application/json");
+        httpExchange.sendResponseHeaders(400, -1);
+        httpExchange.close();
+    }
     private HashMap<String, String> getQueryParams(HttpExchange httpExchange) {
         HashMap<String, String> query = new HashMap<>();
         String[] splitQuery = httpExchange.getRequestURI().getRawQuery().split("&");

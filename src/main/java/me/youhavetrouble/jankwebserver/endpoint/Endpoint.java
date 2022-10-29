@@ -1,18 +1,26 @@
 package me.youhavetrouble.jankwebserver.endpoint;
 
-import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.Headers;
+import me.youhavetrouble.jankwebserver.RequestMethod;
 import me.youhavetrouble.jankwebserver.response.HttpResponse;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.net.URI;
 import java.util.Map;
 
 public interface Endpoint {
 
     String path();
 
+    /**
+     * Handle the incoming request data and return a response
+     * @return Response to send back
+     */
     HttpResponse handle(
-            @NotNull HttpExchange httpExchange,
+            @NotNull RequestMethod requestMethod,
+            @NotNull URI requestURI,
+            @NotNull Headers headers,
             @NotNull Map<String, String> queryParams,
             @Nullable String requestBody
     );
