@@ -38,20 +38,20 @@ public class JsonResponse implements HttpResponse {
         return body.toString();
     }
 
-    public JsonResponse create(JSONObject body, int status) {
+    public static JsonResponse create(JSONObject body, int status) {
         return new JsonResponse(status, body);
     }
 
-    public JsonResponse create(String body, int status) throws JSONException {
+    public static JsonResponse create(String body, int status) throws JSONException {
         JSONObject jsonObject = new JSONObject(body);
         return new JsonResponse(status, jsonObject);
     }
 
-    public JsonResponse create(JSONObject body) {
+    public static JsonResponse create(JSONObject body) {
         return create(body, 200);
     }
 
-    public JsonResponse create(String body) throws JSONException {
+    public static JsonResponse create(String body) throws JSONException {
         return create(body, 200);
     }
 
