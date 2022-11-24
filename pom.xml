@@ -32,11 +32,11 @@
                     <transformers>
                         <transformer
                                 implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                            <mainClass>me.youhavetrouble.meapi.MeAPI</mainClass>
+                            <mainClass>me.youhavetrouble.jankwebserver.JankWebServer</mainClass>
                         </transformer>
                     </transformers>
                     <shadedArtifactAttached>true</shadedArtifactAttached>
-                    <shadedArtifactId>MeAPI</shadedArtifactId>
+                    <shadedArtifactId>JankWebServer</shadedArtifactId>
                     <finalName>${project.artifactId}</finalName>
                 </configuration>
                 <executions>
