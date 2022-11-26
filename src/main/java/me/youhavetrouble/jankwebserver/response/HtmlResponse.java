@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Response containing html
+ */
 public class HtmlResponse implements HttpResponse {
 
     private final int status;

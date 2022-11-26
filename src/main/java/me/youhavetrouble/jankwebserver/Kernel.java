@@ -16,9 +16,9 @@ import java.util.regex.Pattern;
 
 public class Kernel implements HttpHandler {
 
-    protected Kernel() {}
-
     private final HashSet<Endpoint> endpoints = new HashSet<>();
+
+    protected Kernel() {}
 
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {

@@ -7,6 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Response containing a JSON object
+ */
 public class JsonResponse implements HttpResponse {
 
     private final int status;

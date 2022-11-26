@@ -15,11 +15,9 @@ import java.util.logging.Logger;
 public class JankWebServer {
 
     public final static Logger logger = Logger.getLogger("JankWebServer");
-
     private final Executor executor;
     private final Kernel kernel;
     private final int port;
-
     private HttpServer server;
     private boolean started = false;
 
@@ -57,6 +55,7 @@ public class JankWebServer {
         server = HttpServer.create(new InetSocketAddress(this.port), 0);
         server.setExecutor(executor);
         server.createContext("/", kernel);
+        server.start();
         logger.info(String.format("Started web server on port %s", port));
     }
 
