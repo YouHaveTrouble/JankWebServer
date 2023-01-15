@@ -5,6 +5,7 @@ import me.youhavetrouble.jankwebserver.endpoint.Endpoint;
 import me.youhavetrouble.jankwebserver.exception.EndpointAlreadyRegisteredException;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executor;
@@ -43,6 +44,16 @@ public class JankWebServer {
      */
     public void unregisterEndpoint(Endpoint endpoint) {
         this.kernel.unregisterEndpoint(endpoint);
+    }
+
+    /**
+     * Allows to set a directory as static resource provider.<br>
+     * Static resources will be provided if no endpoints have been matched,
+     * but resource exists on path relative to directory set here.
+     * @param file Resource directory
+     */
+    public void setStaticResourceDirectory(File file) {
+        this.kernel.setStaticDirectory(file);
     }
 
     /**
