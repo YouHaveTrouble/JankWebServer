@@ -8,9 +8,9 @@ import me.youhavetrouble.jankwebserver.exception.NotDirectoryException;
 import me.youhavetrouble.jankwebserver.response.HttpResponse;
 
 import java.io.*;
+import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
@@ -64,8 +64,7 @@ public class Kernel implements HttpHandler {
             }
         }
 
-        HashMap<String, String> queryParams = getQueryParams(httpExchange);
-
+        HashMap<String, String> queryParams = getQueryParams(httpExchange.getRequestURI());
         String requestBody = new String(httpExchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
 
         RequestMethod requestMethod = null;
@@ -95,10 +94,9 @@ public class Kernel implements HttpHandler {
         httpExchange.getResponseHeaders().putAll(response.headers());
 
         httpExchange.getResponseHeaders().set("Content-Type", response.contentType());
-        httpExchange.getResponseBody().write(response.body().getBytes(StandardCharsets.UTF_8));
         httpExchange.sendResponseHeaders(response.status(), response.body().length());
+        httpExchange.getResponseBody().write(response.body().getBytes(StandardCharsets.UTF_8));
         httpExchange.close();
-
     }
 
     protected void registerEndpoint(Endpoint endpoint) {
@@ -130,9 +128,10 @@ public class Kernel implements HttpHandler {
         httpExchange.close();
     }
 
-    private HashMap<String, String> getQueryParams(HttpExchange httpExchange) {
+    private HashMap<String, String> getQueryParams(URI uri) {
         HashMap<String, String> query = new HashMap<>();
-        String[] splitQuery = httpExchange.getRequestURI().getRawQuery().split("&");
+        if (uri.getRawQuery() == null) return query;
+        String[] splitQuery = uri.getRawQuery().split("&");
         for (String param : splitQuery) {
             final int idx = param.indexOf("=");
             final String key = idx > 0 ? param.substring(0, idx) : param;
