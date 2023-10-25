@@ -6,7 +6,7 @@
 
     <groupId>me.youhavetrouble</groupId>
     <artifactId>JankWebServer</artifactId>
-    <version>20221126</version>
+    <version>20231025</version>
 
     <properties>
         <java.version>17</java.version>
