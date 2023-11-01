@@ -51,6 +51,10 @@
                                     <pattern>org.json</pattern>
                                     <shadedPattern>me.youhavetrouble.jankwebserver.org.json</shadedPattern>
                                 </relocation>
+                                <relocation>
+                                    <pattern>org.jetbrains.annotations</pattern>
+                                    <shadedPattern>me.youhavetrouble.jankwebserver.org.jetbrains.annotations</shadedPattern>
+                                </relocation>
                             </relocations>
                         </configuration>
                     </execution>
@@ -69,7 +73,7 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20230618</version>
+            <version>20231013</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
